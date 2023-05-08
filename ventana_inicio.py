@@ -3,14 +3,14 @@ import sys
 from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QLabel, QApplication, QVBoxLayout, QPushButton
 from PyQt5 import QtGui, QtCore, QtWidgets
-
+from ventana_principal import Ventana_Principal
 
 class Ventana_Inicio(QMainWindow):
 
     def __init__(self, parent=None):
         super(Ventana_Inicio, self).__init__(parent)
 
-        self.setWindowTitle("Formulario de registro")
+        self.setWindowTitle("Ventanita De Ventas")
 
         self.setWindowIcon(QtGui.QIcon("imagenes/Logo-PPI.jpeg"))
         self.ancho = 1200
@@ -34,13 +34,13 @@ class Ventana_Inicio(QMainWindow):
 
         self.setCentralWidget(self.fondo)
 
-        self.vertical = QVBoxLayout()
+
 
 
         self.grid = QtWidgets.QGridLayout()
 
         self.letreroBienvenida = QLabel("Bienvenidos a")
-        self.letreroBienvenida.setStyleSheet("background-color: #CAE1FF; color: #000000; border:solid; border-width:1px; border-color: FF0000;"
+        self.letreroBienvenida.setStyleSheet("background-color: #BFEFFF; color: #000000; border:solid; border-width:1px; border-color: FF0000;"
                                     "border-radius:10px;")
         self.letreroBienvenida.setFont(QFont("Comic Sans MS", 20))
 
@@ -65,6 +65,9 @@ class Ventana_Inicio(QMainWindow):
     def accion_BotonComenzar(self):
         print("1")
         self.hide()
+        self.ventana_principal = Ventana_Principal()
+        self.ventana_principal.show()
+
 
 if __name__ == '__main__':
     # hacer que la aplicacion se genere
