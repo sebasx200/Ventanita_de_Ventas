@@ -64,7 +64,7 @@ class Ventana_Inicio(QMainWindow):
 
     def accion_BotonComenzar(self):
         print("1")
-        self.hide()
+        
 
 if __name__ == '__main__':
     # hacer que la aplicacion se genere
