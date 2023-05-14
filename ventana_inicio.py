@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QLabel, QApplication, Q
 from PyQt5 import QtGui, QtCore, QtWidgets
 from ventana_principal import Ventana_Principal
 
+
 class Ventana_Inicio(QMainWindow):
 
     def __init__(self, parent=None):
@@ -34,9 +35,6 @@ class Ventana_Inicio(QMainWindow):
 
         self.setCentralWidget(self.fondo)
 
-
-
-
         self.grid = QtWidgets.QGridLayout()
 
         self.letreroBienvenida = QLabel("Bienvenidos a")
@@ -63,15 +61,10 @@ class Ventana_Inicio(QMainWindow):
         self.fondo.setLayout(self.grid)
 
     def accion_BotonComenzar(self):
-        print("1")
-<<<<<<< HEAD
-        
-=======
-        self.hide()
-        self.ventana_principal = Ventana_Principal()
-        self.ventana_principal.show()
 
->>>>>>> bc79b39ffade0ae3ff93eaeabe340fc52be251f9
+        self.hide()
+        self.ventanaPrincipal = Ventana_Principal(self)
+        self.ventanaPrincipal.show()
 
 if __name__ == '__main__':
     # hacer que la aplicacion se genere
