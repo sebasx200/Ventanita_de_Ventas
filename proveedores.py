@@ -3,19 +3,19 @@ import sys
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QWidget, QLabel, QToolBar, QAction, QVBoxLayout, \
-    QDialogButtonBox, QDialog, QApplication, QLineEdit
+    QDialogButtonBox, QDialog, QApplication, QLineEdit, QPushButton, QHBoxLayout, QGridLayout, QFormLayout
 from PyQt5 import QtGui, QtWidgets, QtCore
 
-import ventanas
-from ventanas import añadir_proveedor
+import adicionarproveedor
+from adicionarproveedor import VentanaAdicionar
 
 
 class Ventana_Proveedores(QMainWindow):
 
-    def __init__(self, anterior):
-        super(Ventana_Proveedores, self).__init__(anterior)
+    def __init__(self, parent=None):
+        super(Ventana_Proveedores, self).__init__(parent)
 
-        self.ventanaAnterior = anterior
+
 
         self.setWindowTitle("Ventanita De Ventas: Proveedores")
 
@@ -54,12 +54,12 @@ class Ventana_Proveedores(QMainWindow):
         self.barradeProveedores.actionTriggered[QAction].connect(self.accion_barradeProveedores)
 
 
-
     def accion_barradeProveedores(self, opcion):
+
 
         if opcion.text() == "Añadir proveedor":
 
-            ventanadialgo.añadir_proveedor()
+            adicionarproveedor.VentanaAdicionar(self)
 
 
 
@@ -70,7 +70,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     # crear un objeto de tipo Ventana1 con el nombre ventana1
-    ventana_proveedores = Ventana_Proveedores(anterior=None)
+    ventana_proveedores = Ventana_Proveedores()
 
 
     # hacer que el objeto ventana1 se vea
