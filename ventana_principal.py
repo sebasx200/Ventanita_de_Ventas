@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QMainWindow, QPushButton, QApplication, QVBoxLayout,
     QDesktopWidget
 from PyQt5 import QtGui, QtCore, QtWidgets
 
+from proveedores import Ventana_Proveedores
 
 
 class Ventana_Principal(QMainWindow):
@@ -56,14 +57,13 @@ class Ventana_Principal(QMainWindow):
         self.grid.addWidget(self.botonBuscar, 3, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter)
         self.grid.addWidget(self.botonVolver, 4, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter)
 
-
-
         self.central.setLayout(self.grid)
 
-
-
     def accion_botonProveedores(self):
-        print("1")
+
+        self.hide()
+        self.proveedores = Ventana_Proveedores(self)
+        self.proveedores.show()
 
     def accion_botonEstadisticas(self):
         print("2")
