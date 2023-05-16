@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QMainWindow, QPushButton, QApplication, QVBoxLayout,
     QDesktopWidget
 from PyQt5 import QtGui, QtCore, QtWidgets
 
-from proveedores import Ventana_Proveedores
+from ventana_proveedores import Ventana_Proveedores
 
 
 class Ventana_Principal(QMainWindow):
