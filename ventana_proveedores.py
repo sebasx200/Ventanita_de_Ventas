@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QWidget, QLabel, QToolB
 from PyQt5 import QtGui, QtWidgets, QtCore
 
 import adicionarproveedor
-from adicionarproveedor import VentanaAdicionar
+
 from proveedores import Proveedores
 
 
@@ -33,12 +33,9 @@ class Ventana_Proveedores(QMainWindow):
         self.pantalla.moveCenter(self.centro)
         self.move(self.pantalla.topLeft())
 
-        self.setFixedWidth(self.ancho)
-        self.setFixedHeight(self.alto)
 
         self.central = QWidget()
         self.setCentralWidget(self.central)
-
 
 
         self.barradeProveedores = QToolBar("Barra de proveedores")
@@ -71,7 +68,12 @@ class Ventana_Proveedores(QMainWindow):
 
             # creamos un objeto tipo cliente llamado u
 
-            objetoProveedores = Proveedores(lista[0])
+            objetoProveedores = Proveedores(lista[0],
+                                            lista[1],
+                                            lista[2],
+                                            lista[3],
+                                            lista[4],
+                                            )
 
             self.proveedores.append(objetoProveedores)
 
@@ -81,21 +83,22 @@ class Ventana_Proveedores(QMainWindow):
 
         self.contador = 0
 
-        self.vertical = QVBoxLayout()
+        self.grid = QtWidgets.QGridLayout()
 
         self.letrero1 = QLabel()
 
         self.letrero1.setText("Proveedores registrados")
-        self.letrero1.setFont(QFont("Comic Sans MS", 20))
+        self.letrero1.setFont(QFont("Arial", 20))
         self.letrero1.setStyleSheet("color: #000000;")
 
-        self.vertical.addWidget(self.letrero1)
-        self.vertical.addStretch()
+
 
 
         self.scrollArea = QScrollArea()
 
+
         self.scrollArea.setWidgetResizable(True)
+
 
         self.tabla = QTableWidget()
         self.tabla.setColumnCount(5)
@@ -103,21 +106,38 @@ class Ventana_Proveedores(QMainWindow):
         self.tabla.setColumnWidth(1, 150)
         self.tabla.setColumnWidth(2, 150)
         self.tabla.setColumnWidth(3, 150)
-        self.tabla.setColumnWidth(4, 150)
+        self.tabla.setColumnWidth(4, 160)
 
 
-        self.tabla.setHorizontalHeaderLabels(['Nombre Proveedor'])
+
+
+
+        self.tabla.setHorizontalHeaderLabels(['Nombre Proveedor',
+                                              'Nombre del producto',
+                                              'Cantidad Comprada',
+                                              'Valor $',
+                                              'Cantidad almacén (Unidad)'])
+
+        # Establece el conteo de objetos por fila
         self.tabla.setRowCount(self.numeroProveedores)
 
+        self.scrollArea.setFixedWidth(780)
+        self.scrollArea.setFixedHeight(400)
+
+
+# Bucle que llena la tabla con los objetos de tipo proveedor
+
         for p in self.proveedores:
-            self.tabla.setItem(self.contador, 0, QTableWidgetItem(objetoProveedores.nombreProveedor))
+
+            self.tabla.setItem(self.contador, 0, QTableWidgetItem(p.nombreProveedor))
+            self.tabla.setItem(self.contador, 1, QTableWidgetItem(p.nombreProducto))
+            self.tabla.setItem(self.contador, 2, QTableWidgetItem(p.cantidadComprada))
+            self.tabla.setItem(self.contador, 3, QTableWidgetItem(p.valor))
+            self.tabla.setItem(self.contador, 4, QTableWidgetItem(p.cantidadAlmacen))
+
             self.contador += 1
 
         self.scrollArea.setWidget(self.tabla)
-
-        self.vertical.addWidget(self.scrollArea)
-
-        self.vertical.addStretch()
 
         self.botonVolver = QPushButton("Volver")
 
@@ -130,9 +150,12 @@ class Ventana_Proveedores(QMainWindow):
 
         self.botonVolver.clicked.connect(self.accion_botonVolver)
 
-        self.vertical.addWidget(self.botonVolver)
+        self.grid.addWidget(self.letrero1, 0, 0, QtCore.Qt.AlignCenter | QtCore.Qt.AlignTop)
+        self.grid.addWidget(self.scrollArea, 1, 0, QtCore.Qt.AlignCenter)
+        self.grid.addWidget(self.botonVolver, 2, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeft)
 
-        self.central.setLayout(self.vertical)
+
+        self.central.setLayout(self.grid)
 
     def accion_barradeProveedores(self, opcion):
 
@@ -153,6 +176,7 @@ if __name__ == '__main__':
 
     # crear un objeto de tipo Ventana1 con el nombre ventana1
     ventana_proveedores = Ventana_Proveedores(anterior=None)
+
 
 
     # hacer que el objeto ventana1 se vea
