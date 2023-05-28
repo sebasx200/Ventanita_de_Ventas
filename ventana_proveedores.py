@@ -197,7 +197,84 @@ class Ventana_Proveedores(QMainWindow):
             mensajeConfirmacion = QMessageBox.question(self, 'Confirmación', '¿Está seguro/a de eliminar este proveedor?',
                                                        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
 
+            if mensajeConfirmacion == QMessageBox.StandardButton.Yes:
 
+                if (
+                        self.tabla.item(filaActual, 0).text() != '' and
+                        self.tabla.item(filaActual, 1).text() != '' and
+                        self.tabla.item(filaActual, 2).text() != '' and
+                        self.tabla.item(filaActual, 3).text() != '' and
+                        self.tabla.item(filaActual, 4).text() != ''
+                ):
+                    self.file = open('BaseDeDatos/proveedores.txt', 'rb')
+
+                    proveedores = []
+
+                    while self.file:
+                        linea = self.file.readline().decode('UTF-8')
+
+                        # obtenemos del string una lista con 11 datos separados por ;
+                        lista = linea.split(";")
+                        # se para si ya no hay mas registros en el archivo
+                        if linea == '':
+                            break
+
+                        # creamos un objeto tipo cliente llamado u
+                        objetoProveedores = Proveedores(
+                            lista[0],
+                            lista[1],
+                            lista[2],
+                            lista[3],
+                            lista[4],
+                        )
+
+                        # METEMOS EL OBJETO EN LA LISTA DE USUARIOS
+                        proveedores.append(objetoProveedores)
+
+                    # cerramos el archivo
+                    self.file.close()
+
+                    for p in proveedores:
+                        if (
+                                objetoProveedores.nombreProveedor == self.tabla.item(filaActual, 1).text()
+                        ):
+                            proveedores.remove(objetoProveedores)
+
+                            break
+
+                    self.file = open('BaseDeDatos/proveedores.txt', 'wb')
+
+                    for p in proveedores:
+                        self.file.write(bytes(objetoProveedores.nombreProveedor + ";"
+                                              + objetoProveedores.nombreProducto + ";"
+                                              + objetoProveedores.cantidadComprada + ";"
+                                              + objetoProveedores.valor + ";"
+                                              + objetoProveedores.cantidadAlmacen, encoding='UTF-8'))
+                    self.file.close()
+
+                    self.tabla.removeRow(filaActual)
+
+                    return QMessageBox.question(
+                        self,
+                        'Confirmation',
+                        'El registro ha sido eliminado exitosamente.',
+                        QMessageBox.StandardButton.Yes
+                    )
+
+                    self.tabla.removeRow(filaActual)
+
+        if opcion.text() == "Modificar proveedor":
+
+            ultimaFila = self.tabla.rowCount()
+
+            self.tabla.insertRow(ultimaFila)
+
+            self.tabla.setItem(ultimaFila, 0, QTableWidgetItem(''))
+            self.tabla.setItem(ultimaFila, 1, QTableWidgetItem(''))
+            self.tabla.setItem(ultimaFila, 2, QTableWidgetItem(''))
+            self.tabla.setItem(ultimaFila, 3, QTableWidgetItem(''))
+            self.tabla.setItem(ultimaFila, 4, QTableWidgetItem(''))
+                    
 
     def accion_botonVolver(self):
 

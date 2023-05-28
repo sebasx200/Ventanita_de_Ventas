@@ -1,5 +1,6 @@
-from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QScrollArea, QTableWidget
+from PyQt5.QtCore import QSize
+from PyQt5.QtGui import QFont, QIcon
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QScrollArea, QTableWidget, QAction, QToolBar, QMainWindow
 from PyQt5 import QtCore, QtWidgets
 
 
@@ -12,12 +13,30 @@ class VentanaItemProveedor(QDialog):
 
         self.elementoTabla = item
 
-        self.setWindowTitle(self.elementoTabla)
+        self.setWindowTitle("Proveedor " + self.elementoTabla)
 
         self.setFixedWidth(1000)
         self.setFixedHeight(600)
 
+        self.barradeProductos = QToolBar("Barra de productos")
+        self.barradeProductos.setIconSize(QSize(50, 50))
+
+
+        self.añadir = QAction(QIcon("imagenes/add.png"), "Añadir proveedor", self)
+        self.barradeProductos.addAction(self.añadir)
+
+        self.modificar = QAction(QIcon("imagenes/editar.png"), "Modificar proveedor", self)
+        self.barradeProductos.addAction(self.modificar)
+
+        self.eliminar = QAction(QIcon("imagenes/eliminar.png"), "Eliminar proveedor", self)
+        self.barradeProductos.addAction(self.eliminar)
+
+        self.barradeProductos.actionTriggered[QAction].connect(self.accion_barradeProductos)
+
         self.grid = QtWidgets.QGridLayout()
+
+
+
 
         self.letrero1 = QLabel()
 
@@ -43,17 +62,24 @@ class VentanaItemProveedor(QDialog):
                                               'Valor $',
                                               'Cantidad almacén (Unidad)'])
 
+
+
+
         self.scrollArea.setFixedWidth(610)
         self.scrollArea.setFixedHeight(400)
         self.scrollArea.setWidget(self.tabla)
 
-
-        self.grid.addWidget(self.letrero1, 0, 0, QtCore.Qt.AlignCenter | QtCore.Qt.AlignTop)
-        self.grid.addWidget(self.scrollArea, 1, 0, QtCore.Qt.AlignCenter | QtCore.Qt.AlignBottom)
+        self.grid.addWidget(self.barradeProductos, 0, 0, QtCore.Qt.AlignCenter | QtCore.Qt.AlignTop)
+        self.grid.addWidget(self.letrero1, 1, 0, QtCore.Qt.AlignCenter | QtCore.Qt.AlignTop)
+        self.grid.addWidget(self.scrollArea, 2, 0, QtCore.Qt.AlignCenter | QtCore.Qt.AlignBottom)
 
 
 
         self.setLayout(self.grid)
 
         self.exec_()
+
+
+    def accion_barradeProductos(self, opcion):
+        pass
 
