@@ -1,8 +1,9 @@
 import sys
 
 from PyQt5.QtGui import QPixmap, QFont
-from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QLabel, QApplication, QVBoxLayout, QPushButton
+from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QLabel, QApplication, QVBoxLayout, QPushButton, QSizePolicy
 from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5.QtCore import QSize, Qt
 from ventana_principal import Ventana_Principal
 
 
@@ -38,15 +39,17 @@ class Ventana_Inicio(QMainWindow):
         self.grid = QtWidgets.QGridLayout()
 
         self.letreroBienvenida = QLabel("Bienvenidos a")
-        self.letreroBienvenida.setStyleSheet("background-color: #BFEFFF; color: #000000; border:solid; border-width:1px; border-color: FF0000;"
-                                    "border-radius:10px;")
+        self.letreroBienvenida.setFixedWidth(800)
+        self.letreroBienvenida.setAlignment(Qt.AlignCenter)
+        self.letreroBienvenida.setStyleSheet("background-color: #4DA4FF; color: #000000; border:solid; border-width:1px; border-color: FF0000;"
+                                    "border-radius:5px;")
         self.letreroBienvenida.setFont(QFont("Comic Sans MS", 20))
 
 
 
         self.botonComenzar = QPushButton()
         self.botonComenzar.setText("Comenzar")
-        self.botonComenzar.setStyleSheet("background-color: #CAE1FF; color: red; margin-bottom: 10px; border:solid; border-width:1px; border-color: FF0000;")
+        self.botonComenzar.setStyleSheet("background-color: #4DA4FF; color: #000000; margin-bottom: 10px; border:solid; border-width:1px; border-color: FF0000;")
         self.botonComenzar.setFont(QFont("Comic Sans MS", 15))
         self.botonComenzar.setFixedWidth(250)
 

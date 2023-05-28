@@ -32,14 +32,29 @@ class Ventana_Principal(QMainWindow):
         self.setFixedWidth(self.ancho)
         self.setFixedHeight(self.alto)
 
-        self.central = QWidget()
-        self.setCentralWidget(self.central)
+        self.fondo = QLabel(self)
+        self.imagenFondo = QPixmap("imagenes/fondopantalla.jpeg")
+        self.fondo.setPixmap(self.imagenFondo)
+        self.fondo.setScaledContents(True)
+        self.resize(self.imagenFondo.width(), self.imagenFondo.height())
+
+        self.setCentralWidget(self.fondo)
 
         self.grid = QtWidgets.QGridLayout()
 
         self.letrero1 = QLabel ("Con qué quieres empezar")
+        self.letrero1.setAlignment(Qt.AlignCenter)
+        self.letrero1.setStyleSheet(
+            "background-color: #87CEFA; color: #000000; border:solid; border-width:1px; border-color: FF0000;"
+            "border-radius:5px;")
+        self.letrero1.setFixedWidth(800)
+        self.letrero1.setFont(QFont("Comic Sans MS", 20))
 
         self.botonProveedores = QPushButton("Proveedores")
+        self.botonProveedores.setStyleSheet(
+            "background-color: #4DA4FF; color: #000000; margin-bottom: 10px; border:solid; border-width:1px; border-color: FF0000;")
+        self.botonProveedores.setFont(QFont("Comic Sans MS", 15))
+        self.botonProveedores.setFixedWidth(250)
         self.botonProveedores.clicked.connect(self.accion_botonProveedores)
 
         self.botonEstadisticas = QPushButton("Estadísticas")
@@ -57,7 +72,7 @@ class Ventana_Principal(QMainWindow):
         self.grid.addWidget(self.botonBuscar, 3, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter)
         self.grid.addWidget(self.botonVolver, 4, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter)
 
-        self.central.setLayout(self.grid)
+        self.fondo.setLayout(self.grid)
 
     def accion_botonProveedores(self):
 

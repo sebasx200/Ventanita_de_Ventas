@@ -1,7 +1,7 @@
 import sys
 
 from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QVBoxLayout, QApplication, QFormLayout
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, Qt
 
 
 
@@ -10,6 +10,9 @@ class VentanaAdicionar(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+
+        self.setWindowFlag(QtCore.Qt.WindowContextHelpButtonHint, False)
+
         self.setFixedWidth(400)
         self.setFixedHeight(300)
 
@@ -90,4 +93,3 @@ class VentanaAdicionar(QDialog):
 
     def accion_BotonCancelar(self):
         self.reject()
-

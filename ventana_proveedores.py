@@ -1,13 +1,14 @@
 import sys
 
 from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtGui import QIcon, QFont, QPixmap, QColor, QBrush
 from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QWidget, QLabel, QToolBar, QAction, QVBoxLayout, \
     QDialogButtonBox, QDialog, QApplication, QLineEdit, QPushButton, QHBoxLayout, QGridLayout, QFormLayout, QScrollArea, \
-    QTableWidget, QTableWidgetItem
+    QTableWidget, QTableWidgetItem, QMessageBox, QCheckBox
 from PyQt5 import QtGui, QtWidgets, QtCore
 
-import adicionarproveedor
+import adicionar_proveedor
+import proveedor_selec
 
 from proveedores import Proveedores
 
@@ -33,9 +34,16 @@ class Ventana_Proveedores(QMainWindow):
         self.pantalla.moveCenter(self.centro)
         self.move(self.pantalla.topLeft())
 
+        self.fondo = QLabel(self)
+        self.imagenFondo = QPixmap("imagenes/fondopantalla.jpeg")
+        self.fondo.setPixmap(self.imagenFondo)
+        self.fondo.setScaledContents(True)
+        self.resize(self.imagenFondo.width(), self.imagenFondo.height())
 
-        self.central = QWidget()
-        self.setCentralWidget(self.central)
+        self.setFixedWidth(self.ancho)
+        self.setFixedHeight(self.alto)
+
+        self.setCentralWidget(self.fondo)
 
 
         self.barradeProveedores = QToolBar("Barra de proveedores")
@@ -89,7 +97,13 @@ class Ventana_Proveedores(QMainWindow):
 
         self.letrero1.setText("Proveedores registrados")
         self.letrero1.setFont(QFont("Arial", 20))
-        self.letrero1.setStyleSheet("color: #000000;")
+        self.letrero1.setStyleSheet("color: #000000; margin-bottom: 15px")
+
+        self.letrero2 = QLabel()
+
+        self.letrero2.setText("Para ver los productos de cada proveedor, haga doble clic en el proveedor para ver más detalles")
+        self.letrero2.setFont(QFont("Arial", 13))
+        self.letrero2.setStyleSheet("color: #000000; margin-bottom: 15px")
 
 
 
@@ -109,9 +123,6 @@ class Ventana_Proveedores(QMainWindow):
         self.tabla.setColumnWidth(4, 160)
 
 
-
-
-
         self.tabla.setHorizontalHeaderLabels(['Nombre Proveedor',
                                               'Nombre del producto',
                                               'Cantidad Comprada',
@@ -127,6 +138,7 @@ class Ventana_Proveedores(QMainWindow):
 
 # Bucle que llena la tabla con los objetos de tipo proveedor
 
+
         for p in self.proveedores:
 
             self.tabla.setItem(self.contador, 0, QTableWidgetItem(p.nombreProveedor))
@@ -135,9 +147,16 @@ class Ventana_Proveedores(QMainWindow):
             self.tabla.setItem(self.contador, 3, QTableWidgetItem(p.valor))
             self.tabla.setItem(self.contador, 4, QTableWidgetItem(p.cantidadAlmacen))
 
+
             self.contador += 1
 
+        self.tabla.setSelectionBehavior(QTableWidget.SelectRows)
+
+
         self.scrollArea.setWidget(self.tabla)
+
+        self.tabla.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.tabla.itemDoubleClicked.connect(self.accion_itemsTabla)
 
         self.botonVolver = QPushButton("Volver")
 
@@ -151,23 +170,45 @@ class Ventana_Proveedores(QMainWindow):
         self.botonVolver.clicked.connect(self.accion_botonVolver)
 
         self.grid.addWidget(self.letrero1, 0, 0, QtCore.Qt.AlignCenter | QtCore.Qt.AlignTop)
-        self.grid.addWidget(self.scrollArea, 1, 0, QtCore.Qt.AlignCenter)
-        self.grid.addWidget(self.botonVolver, 2, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeft)
+        self.grid.addWidget(self.letrero2, 1, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeft)
+        self.grid.addWidget(self.scrollArea, 2, 0, QtCore.Qt.AlignCenter)
+        self.grid.addWidget(self.botonVolver, 3, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeft)
 
 
-        self.central.setLayout(self.grid)
+        self.fondo.setLayout(self.grid)
 
     def accion_barradeProveedores(self, opcion):
 
 
         if opcion.text() == "Añadir proveedor":
 
-            adicionarproveedor.VentanaAdicionar(self)
+            adicionar_proveedor.VentanaAdicionar(self)
+
+        if opcion.text() == "Eliminar proveedor":
+
+            filaActual = self.tabla.currentRow()
+
+
+            if filaActual <0:
+
+                mensajeAdvertencia = QMessageBox.warning(self, 'Advertencia', 'Debe seleccionar un proveedor para eliminarlo')
+                return mensajeAdvertencia
+
+            mensajeConfirmacion = QMessageBox.question(self, 'Confirmación', '¿Está seguro/a de eliminar este proveedor?',
+                                                       QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+
+
 
     def accion_botonVolver(self):
 
         self.hide()
         self.ventanaAnterior.show()
+
+    def accion_itemsTabla(self, item):
+
+        elemento = item.text()
+        ventanaItemProveedor = proveedor_selec.VentanaItemProveedor(elemento, self)
+
 
 
 if __name__ == '__main__':
