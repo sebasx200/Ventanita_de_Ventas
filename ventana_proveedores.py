@@ -8,8 +8,7 @@ from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QWidget, QLabel, QToolB
 from PyQt5 import QtGui, QtWidgets, QtCore
 
 import adicionar_proveedor
-import proveedor_selec
-
+from proveedor_selec import VentanaItemProveedor
 from proveedores import Proveedores
 
 
@@ -20,6 +19,9 @@ class Ventana_Proveedores(QMainWindow):
         super(Ventana_Proveedores, self).__init__(anterior)
 
         self.ventanaAnterior = anterior
+        self.item = None
+
+        self.itemProveedor = VentanaItemProveedor(self.item)
 
         self.setWindowTitle("Ventanita De Ventas: Proveedores")
 
@@ -156,6 +158,7 @@ class Ventana_Proveedores(QMainWindow):
         self.scrollArea.setWidget(self.tabla)
 
         self.tabla.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.tabla.itemSelectionChanged.connect(self.filtrar_tablaProductos)
         self.tabla.itemDoubleClicked.connect(self.accion_itemsTabla)
 
         self.botonVolver = QPushButton("Volver")
@@ -195,7 +198,7 @@ class Ventana_Proveedores(QMainWindow):
                 return mensajeAdvertencia
 
             mensajeConfirmacion = QMessageBox.question(self, 'Confirmación', '¿Está seguro/a de eliminar este proveedor?',
-                                                       QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+                                                       QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.No)
 
             if mensajeConfirmacion == QMessageBox.StandardButton.Yes:
 
@@ -274,6 +277,7 @@ class Ventana_Proveedores(QMainWindow):
             self.tabla.setItem(ultimaFila, 2, QTableWidgetItem(''))
             self.tabla.setItem(ultimaFila, 3, QTableWidgetItem(''))
             self.tabla.setItem(ultimaFila, 4, QTableWidgetItem(''))
+
                     
 
     def accion_botonVolver(self):
@@ -281,10 +285,15 @@ class Ventana_Proveedores(QMainWindow):
         self.hide()
         self.ventanaAnterior.show()
 
-    def accion_itemsTabla(self, item):
+    def accion_itemsTabla(self, itemSeleccionado):
 
-        elemento = item.text()
-        ventanaItemProveedor = proveedor_selec.VentanaItemProveedor(elemento, self)
+        elemento = itemSeleccionado.text()
+        self.itemProveedor = VentanaItemProveedor(elemento, self).exec_()
+
+    def filtrar_tablaProductos(self):
+        filaActual = self.tabla.currentRow()
+        print("Estos son los elementos de: " + self.tabla.item(filaActual, 0).text())
+
 
 
 
