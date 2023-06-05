@@ -3,7 +3,7 @@ import sys
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QFont, QIcon, QPixmap
 from PyQt5.QtWidgets import QLabel, QScrollArea, QTableWidget, QAction, QToolBar, QMainWindow, \
-    QTableWidgetItem, QMessageBox, QLineEdit, QApplication, QDesktopWidget
+    QTableWidgetItem, QMessageBox, QLineEdit, QApplication, QDesktopWidget, QPushButton
 from PyQt5 import QtCore, QtWidgets, QtGui
 
 import adicionar_proveedor
@@ -13,10 +13,17 @@ from productos import Productos
 
 class Ventana_Productos(QMainWindow):
 
-    def __init__(self, anterior):
+    def __init__(self, anterior, diccionario, item):
         super(Ventana_Productos, self).__init__(anterior)
 
         self.ventanaAnterior = anterior
+        self.dProveedores = diccionario
+        self.elementoSeleccionado = item
+        print(self.dProveedores)
+
+        self.datosProveedor = self.dProveedores.get(self.elementoSeleccionado)
+        print(self.datosProveedor)
+
 
         self.setWindowTitle("Productos registrados")
 
@@ -90,9 +97,18 @@ class Ventana_Productos(QMainWindow):
 
         self.letrero1 = QLabel()
 
-        self.letrero1.setText("Productos registrados")
+        self.letrero1.setText("Productos registrados " + str(self.elementoSeleccionado))
         self.letrero1.setFont(QFont("Arial", 15))
         self.letrero1.setStyleSheet("color: #000000; margin-bottom: 15px")
+
+        self.addProducto = QLineEdit()
+        self.botonAdd = QPushButton("Añadir")
+        self.botonAdd.clicked.connect(self.accion_BotonAdd)
+
+
+        self.botonVolver = QPushButton("Volver")
+        self.botonVolver.clicked.connect(self.accion_botonVolver)
+
 
 
         self.scrollArea = QScrollArea()
@@ -127,29 +143,36 @@ class Ventana_Productos(QMainWindow):
         self.grid.addWidget(self.barradeProductos, 0, 0, QtCore.Qt.AlignCenter | QtCore.Qt.AlignTop)
         self.grid.addWidget(self.letrero1, 1, 0, QtCore.Qt.AlignCenter | QtCore.Qt.AlignTop)
         self.grid.addWidget(self.scrollArea, 2, 0, QtCore.Qt.AlignCenter | QtCore.Qt.AlignBottom)
+        self.grid.addWidget(self.botonVolver, 3, 0, QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom)
+        self.grid.addWidget(self.addProducto, 4, 0, QtCore.Qt.AlignCenter | QtCore.Qt.AlignBottom)
+        self.grid.addWidget(self.botonAdd, 5, 0, QtCore.Qt.AlignRight | QtCore.Qt.AlignBottom)
+
 
 
 
 
         self.fondo.setLayout(self.grid)
 
-        # Bucle que llena la tabla con los objetos de tipo productos
-
-        self.numeroProductos = len(self.productos)
-        self.contador = 0
-
-        # Establece el conteo de objetos por fila
-        self.tabla.setRowCount(self.numeroProductos)
-
-        for p in self.productos:
-
-            self.tabla.setItem(self.contador, 0, QTableWidgetItem(p.nombreProducto))
-            self.tabla.setItem(self.contador, 1, QTableWidgetItem(p.cantidadComprada))
-            self.tabla.setItem(self.contador, 2, QTableWidgetItem(p.valor))
-            self.tabla.setItem(self.contador, 3, QTableWidgetItem(p.cantidadAlmacen))
+        self.llenar_tabla()
 
 
-            self.contador += 1
+    def llenar_tabla(self):
+
+        self.tabla.setColumnCount(4)
+        self.tabla.setRowCount(1)
+
+        if self.datosProveedor:
+
+            self.tabla.setItem(0, 1, QTableWidgetItem(str(self.datosProveedor)))
+
+    def accion_BotonAdd(self):
+
+        for nombreProveedor, productosProveedor in self.dProveedores.items():
+
+            if productosProveedor:
+                nuevodato = ["mega 3l"]
+                productosProveedor[0].extend(nuevodato)
+                self.dProveedores[nombreProveedor] = productosProveedor
 
 
     def accion_barradeProductos(self, opcion):
@@ -158,4 +181,9 @@ class Ventana_Productos(QMainWindow):
         if opcion.text() == "Añadir producto":
 
             adicionar_proveedor.VentanaAdicionarProducto(self)
+
+    def accion_botonVolver(self):
+
+        self.hide()
+        self.ventanaAnterior.show()
 

@@ -1,3 +1,3 @@
 personal 250 mm;3;9000;3;
-personal 250 mm;3;9000;3;
+Chocorramo;3;6000;3;
 Desodorante roll on;5;14000;7;

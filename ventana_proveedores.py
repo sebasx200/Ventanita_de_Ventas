@@ -119,11 +119,8 @@ class Ventana_Proveedores(QMainWindow):
 
         for nProveedor, datosProveedor in zip(self.proveedores, self.productos):
             if datosProveedor:
-                self.dProveedores[nProveedor.nombreProveedor] = datosProveedor.nombreProducto, datosProveedor.cantidadComprada, datosProveedor.valor, datosProveedor.cantidadAlmacen
+                self.dProveedores[nProveedor.nombreProveedor] = [datosProveedor.nombreProducto, datosProveedor.cantidadComprada, datosProveedor.valor, datosProveedor.cantidadAlmacen]
 
-
-
-        print(self.dProveedores)
 
         self.grid = QtWidgets.QGridLayout()
 
@@ -142,6 +139,9 @@ class Ventana_Proveedores(QMainWindow):
         self.botonVerProductos = QPushButton("Ver productos")
         self.botonVerProductos.clicked.connect(self.accion_botonVerProductos)
 
+        self.botonAdd = QPushButton("Añadir")
+        self.botonAdd.clicked.connect(self.accion_BotonAdd)
+
         self.scrollArea = QScrollArea()
 
 
@@ -155,6 +155,7 @@ class Ventana_Proveedores(QMainWindow):
         self.tabla.setColumnWidth(2, 150)
         self.tabla.setColumnWidth(3, 150)
         self.tabla.setColumnWidth(4, 160)
+
 
 
         self.tabla.setHorizontalHeaderLabels(['Nombre Proveedor',
@@ -173,6 +174,8 @@ class Ventana_Proveedores(QMainWindow):
 
 
         self.tabla.setSelectionBehavior(QTableWidget.SelectRows)
+
+        self.tabla.itemDoubleClicked.connect(self.accion_itemClic)
 
 
         self.scrollArea.setWidget(self.tabla)
@@ -196,6 +199,7 @@ class Ventana_Proveedores(QMainWindow):
         self.grid.addWidget(self.scrollArea, 2, 0, QtCore.Qt.AlignCenter)
         self.grid.addWidget(self.botonVolver, 3, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeft)
         self.grid.addWidget(self.botonVerProductos, 3, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight)
+        self.grid.addWidget(self.botonAdd, 4, 0, QtCore.Qt.AlignCenter | QtCore.Qt.AlignBottom)
 
 
 
@@ -222,6 +226,23 @@ class Ventana_Proveedores(QMainWindow):
                 self.tabla.setItem(conteoFilas, i + 1, item)
 
             conteoFilas += 1
+
+    def accion_itemClic(self, itemclic):
+
+        elementoSelecciondo = itemclic.text()
+        self.ventanaProductos = Ventana_Productos(self, self.dProveedores, elementoSelecciondo)
+        self.ventanaProductos.show()
+
+    def accion_BotonAdd(self):
+
+        for nProveedor, productosProveedor in self.dProveedores.items():
+
+            if productosProveedor:
+
+                nuevodato = "mega 3l"
+                productosProveedor.remove(nuevodato)
+                self.dProveedores[nProveedor] = productosProveedor
+
 
 
 
@@ -331,7 +352,7 @@ class Ventana_Proveedores(QMainWindow):
     def accion_botonVerProductos(self):
 
         self.hide()
-        self.ventanaProductos = Ventana_Productos(self)
+        self.ventanaProductos = Ventana_Productos(self, self.dProveedores)
         self.ventanaProductos.show()
 
 
