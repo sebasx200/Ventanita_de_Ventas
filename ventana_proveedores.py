@@ -1,3 +1,4 @@
+import itertools
 import sys
 
 from PyQt5.QtCore import QSize, Qt
@@ -8,8 +9,12 @@ from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QWidget, QLabel, QToolB
 from PyQt5 import QtGui, QtWidgets, QtCore
 
 import adicionar_proveedor
-from proveedor_selec import VentanaItemProveedor
+import ventana_productos
+import proveedores
+from productos import Productos
+from ventana_productos import Ventana_Productos
 from proveedores import Proveedores
+from PyQt5.QtCore import pyqtSignal
 
 
 
@@ -19,9 +24,6 @@ class Ventana_Proveedores(QMainWindow):
         super(Ventana_Proveedores, self).__init__(anterior)
 
         self.ventanaAnterior = anterior
-        self.item = None
-
-        self.itemProveedor = VentanaItemProveedor(self.item)
 
         self.setWindowTitle("Ventanita De Ventas: Proveedores")
 
@@ -68,30 +70,60 @@ class Ventana_Proveedores(QMainWindow):
         self.proveedores = []
 
         while self.file:
+
             linea = self.file.readline().decode('UTF-8')
 
-            # obtenemos del string una lista con 11 datos separados por ;
+            # obtenemos del string una lista con 4 datos separados por ;
             lista = linea.split(";")
             # se para si ya no hay mas registros en el archivo
+            print(lista)
             if linea == '':
                 break
-
             # creamos un objeto tipo cliente llamado u
 
-            objetoProveedores = Proveedores(lista[0],
-                                            lista[1],
-                                            lista[2],
-                                            lista[3],
-                                            lista[4],
+            self.objetoProveedores = Proveedores(lista[0],
                                             )
-
-            self.proveedores.append(objetoProveedores)
+            self.proveedores.append(self.objetoProveedores)
 
         self.file.close()
 
-        self.numeroProveedores = len(self.proveedores)
 
-        self.contador = 0
+
+        self.fileP = open('BaseDeDatos/productos.txt', 'rb')
+
+        self.productos = []
+
+        linea = self.fileP.readline().decode('UTF-8').strip()
+
+        while linea:
+
+            if linea == '':
+
+                self.productos.append([])
+
+            else:
+                lista = linea.split(";")
+
+                self.objetoProductos = Productos(lista[0],
+                                            lista[1],
+                                            lista[2],
+                                            lista[3],
+                                            )
+
+                self.productos.append(self.objetoProductos)
+            linea = self.fileP.readline().decode('UTF-8').strip()
+
+        self.fileP.close()
+
+        self.dProveedores = {}
+
+        for nProveedor, datosProveedor in zip(self.proveedores, self.productos):
+            if datosProveedor:
+                self.dProveedores[nProveedor.nombreProveedor] = datosProveedor.nombreProducto, datosProveedor.cantidadComprada, datosProveedor.valor, datosProveedor.cantidadAlmacen
+
+
+
+        print(self.dProveedores)
 
         self.grid = QtWidgets.QGridLayout()
 
@@ -107,8 +139,8 @@ class Ventana_Proveedores(QMainWindow):
         self.letrero2.setFont(QFont("Arial", 13))
         self.letrero2.setStyleSheet("color: #000000; margin-bottom: 15px")
 
-
-
+        self.botonVerProductos = QPushButton("Ver productos")
+        self.botonVerProductos.clicked.connect(self.accion_botonVerProductos)
 
         self.scrollArea = QScrollArea()
 
@@ -131,26 +163,14 @@ class Ventana_Proveedores(QMainWindow):
                                               'Valor $',
                                               'Cantidad almacén (Unidad)'])
 
-        # Establece el conteo de objetos por fila
-        self.tabla.setRowCount(self.numeroProveedores)
+
 
         self.scrollArea.setFixedWidth(780)
         self.scrollArea.setFixedHeight(400)
 
 
-# Bucle que llena la tabla con los objetos de tipo proveedor
+        self.accion_llenarTabla()
 
-
-        for p in self.proveedores:
-
-            self.tabla.setItem(self.contador, 0, QTableWidgetItem(p.nombreProveedor))
-            self.tabla.setItem(self.contador, 1, QTableWidgetItem(p.nombreProducto))
-            self.tabla.setItem(self.contador, 2, QTableWidgetItem(p.cantidadComprada))
-            self.tabla.setItem(self.contador, 3, QTableWidgetItem(p.valor))
-            self.tabla.setItem(self.contador, 4, QTableWidgetItem(p.cantidadAlmacen))
-
-
-            self.contador += 1
 
         self.tabla.setSelectionBehavior(QTableWidget.SelectRows)
 
@@ -158,8 +178,7 @@ class Ventana_Proveedores(QMainWindow):
         self.scrollArea.setWidget(self.tabla)
 
         self.tabla.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-        self.tabla.itemSelectionChanged.connect(self.filtrar_tablaProductos)
-        self.tabla.itemDoubleClicked.connect(self.accion_itemsTabla)
+
 
         self.botonVolver = QPushButton("Volver")
 
@@ -176,9 +195,35 @@ class Ventana_Proveedores(QMainWindow):
         self.grid.addWidget(self.letrero2, 1, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeft)
         self.grid.addWidget(self.scrollArea, 2, 0, QtCore.Qt.AlignCenter)
         self.grid.addWidget(self.botonVolver, 3, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeft)
+        self.grid.addWidget(self.botonVerProductos, 3, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight)
+
+
 
 
         self.fondo.setLayout(self.grid)
+
+
+    def accion_llenarTabla(self):
+
+        conteoFilas = self.tabla.rowCount()
+
+        for p in self.proveedores:
+
+            self.tabla.insertRow(conteoFilas)
+
+            itemProveedor = QTableWidgetItem(p.nombreProveedor)
+            self.tabla.setItem(conteoFilas, 0, itemProveedor)
+
+            # Obtener los datos del estudiante del diccionario
+            datosDiccionario = self.dProveedores.setdefault(p.nombreProveedor, [])
+
+            for i, value in enumerate(datosDiccionario):
+                item = QTableWidgetItem(str(value))  # Utilizar el valor actual de data
+                self.tabla.setItem(conteoFilas, i + 1, item)
+
+            conteoFilas += 1
+
+
 
     def accion_barradeProveedores(self, opcion):
 
@@ -278,21 +323,16 @@ class Ventana_Proveedores(QMainWindow):
             self.tabla.setItem(ultimaFila, 3, QTableWidgetItem(''))
             self.tabla.setItem(ultimaFila, 4, QTableWidgetItem(''))
 
-                    
-
     def accion_botonVolver(self):
 
         self.hide()
         self.ventanaAnterior.show()
 
-    def accion_itemsTabla(self, itemSeleccionado):
+    def accion_botonVerProductos(self):
 
-        elemento = itemSeleccionado.text()
-        self.itemProveedor = VentanaItemProveedor(elemento, self).exec_()
-
-    def filtrar_tablaProductos(self):
-        filaActual = self.tabla.currentRow()
-        print("Estos son los elementos de: " + self.tabla.item(filaActual, 0).text())
+        self.hide()
+        self.ventanaProductos = Ventana_Productos(self)
+        self.ventanaProductos.show()
 
 
 

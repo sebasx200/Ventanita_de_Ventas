@@ -1,3 +1,3 @@
-personal 250 mm;1;3000;1
-personal;2;5000;
 personal 250 mm;3;9000;3;
+personal 250 mm;3;9000;3;
+Desodorante roll on;5;14000;7;
