@@ -161,9 +161,17 @@ class Ventana_Productos(QMainWindow):
         self.tabla.setColumnCount(4)
         self.tabla.setRowCount(1)
 
+        conteoFilas = 0
         if self.datosProveedor:
 
-            self.tabla.setItem(0, 1, QTableWidgetItem(str(self.datosProveedor)))
+
+            self.tabla.insertRow(conteoFilas)
+
+            for column, dato in enumerate(self.datosProveedor):
+                item = QTableWidgetItem(dato)
+                self.tabla.setItem(conteoFilas, column, item)
+
+            conteoFilas += 1
 
     def accion_BotonAdd(self):
 
