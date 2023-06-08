@@ -5,10 +5,9 @@ from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QIcon, QFont, QPixmap, QColor, QBrush
 from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QWidget, QLabel, QToolBar, QAction, QVBoxLayout, \
     QDialogButtonBox, QDialog, QApplication, QLineEdit, QPushButton, QHBoxLayout, QGridLayout, QFormLayout, QScrollArea, \
-    QTableWidget, QTableWidgetItem, QMessageBox, QCheckBox
+    QTableWidget, QTableWidgetItem, QMessageBox, QCheckBox, QTextBrowser
 from PyQt5 import QtGui, QtWidgets, QtCore
 
-import adicionar_proveedor
 import ventana_productos
 import proveedores
 from productos import Productos
@@ -88,7 +87,6 @@ class Ventana_Proveedores(QMainWindow):
         self.file.close()
 
 
-
         self.fileP = open('BaseDeDatos/productos.txt', 'rb')
 
         self.productos = []
@@ -119,8 +117,25 @@ class Ventana_Proveedores(QMainWindow):
 
         for nProveedor, datosProveedor in zip(self.proveedores, self.productos):
             if datosProveedor:
-                self.dProveedores[nProveedor.nombreProveedor] = [datosProveedor.nombreProducto, datosProveedor.cantidadComprada, datosProveedor.valor, datosProveedor.cantidadAlmacen]
+                self.dProveedores[nProveedor.nombreProveedor] = [datosProveedor.nombreProducto], [datosProveedor.cantidadComprada], [datosProveedor.valor], [datosProveedor.cantidadAlmacen]
 
+        nombre_proveedor = 'Coca cola'
+        nombre_producto = 'Nuevo Producto'
+        cantidad_comprada = 10
+        valor = 100
+
+        # Verificar si la clave existe en el diccionario
+        if nombre_proveedor in self.dProveedores:
+            # La clave existe, agregar los datos del nuevo producto a la lista de valores
+            self.dProveedores[nombre_proveedor][0].append(nombre_producto)
+            self.dProveedores[nombre_proveedor][1].append(cantidad_comprada)
+            self.dProveedores[nombre_proveedor][2].append(valor)
+        else:
+            # La clave no existe, mostrar un mensaje de error o realizar alguna acción de manejo de errores
+            print('La clave no existe en el diccionario')
+
+        # Verificar si el cambio se reflejó en el diccionario
+        print(self.dProveedores)
 
         self.grid = QtWidgets.QGridLayout()
 
@@ -137,10 +152,30 @@ class Ventana_Proveedores(QMainWindow):
         self.letrero2.setStyleSheet("color: #000000; margin-bottom: 15px")
 
         self.botonVerProductos = QPushButton("Ver productos")
+        self.botonVerProductos.setStyleSheet("background-color : #FFFFFF;"
+                                       "color : #000000;"
+                                       "padding: 10 px;"
+                                       )
+        self.botonVerProductos.setFixedWidth(100)
         self.botonVerProductos.clicked.connect(self.accion_botonVerProductos)
 
-        self.botonAdd = QPushButton("Añadir")
-        self.botonAdd.clicked.connect(self.accion_BotonAdd)
+
+        self.botonAdd = QPushButton("Aceptar")
+        self.botonAdd.setStyleSheet("background-color : #FFFFFF;"
+                                             "color : #000000;"
+                                             "padding: 10 px;"
+                                             )
+        self.botonAdd.setFixedWidth(100)
+        self.botonAdd.clicked.connect(self.accion_botonAdd)
+
+        self.botonVolver = QPushButton("Volver")
+        self.botonVolver.setStyleSheet("background-color : #FFFFFF;"
+                                       "color : #000000;"
+                                       "padding: 10 px;"
+                                       )
+        self.botonVolver.setFixedWidth(100)
+        self.botonVolver.clicked.connect(self.accion_botonVolver)
+
 
         self.scrollArea = QScrollArea()
 
@@ -165,7 +200,6 @@ class Ventana_Proveedores(QMainWindow):
                                               'Cantidad almacén (Unidad)'])
 
 
-
         self.scrollArea.setFixedWidth(780)
         self.scrollArea.setFixedHeight(400)
 
@@ -173,39 +207,30 @@ class Ventana_Proveedores(QMainWindow):
         self.accion_llenarTabla()
 
 
-        self.tabla.setSelectionBehavior(QTableWidget.SelectRows)
+
 
         self.tabla.itemDoubleClicked.connect(self.accion_itemClic)
 
 
         self.scrollArea.setWidget(self.tabla)
 
-        self.tabla.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        #self.tabla.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
 
-        self.botonVolver = QPushButton("Volver")
 
-        self.botonVolver.setFixedWidth(100)
-
-        self.botonVolver.setStyleSheet("background-color : #FFFFFF;"
-                                       "color : #000000;"
-                                       "padding: 10 px;"
-                                       )
-
-        self.botonVolver.clicked.connect(self.accion_botonVolver)
 
         self.grid.addWidget(self.letrero1, 0, 0, QtCore.Qt.AlignCenter | QtCore.Qt.AlignTop)
         self.grid.addWidget(self.letrero2, 1, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeft)
         self.grid.addWidget(self.scrollArea, 2, 0, QtCore.Qt.AlignCenter)
         self.grid.addWidget(self.botonVolver, 3, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeft)
         self.grid.addWidget(self.botonVerProductos, 3, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight)
-        self.grid.addWidget(self.botonAdd, 4, 0, QtCore.Qt.AlignCenter | QtCore.Qt.AlignBottom)
+        self.grid.addWidget(self.botonAdd, 4, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight)
 
 
 
 
         self.fondo.setLayout(self.grid)
-
+        print(self.dProveedores)
 
     def accion_llenarTabla(self):
 
@@ -218,31 +243,30 @@ class Ventana_Proveedores(QMainWindow):
             itemProveedor = QTableWidgetItem(p.nombreProveedor)
             self.tabla.setItem(conteoFilas, 0, itemProveedor)
 
-            # Obtener los datos del estudiante del diccionario
             datosDiccionario = self.dProveedores.setdefault(p.nombreProveedor, [])
 
-            for i, value in enumerate(datosDiccionario):
-                item = QTableWidgetItem(str(value))  # Utilizar el valor actual de data
+            maxAltura = 0  # Variable para almacenar la altura máxima de la fila
+
+            for i, valores in enumerate(datosDiccionario):
+                # Combinar los valores en una sola cadena, separados por salto de línea
+                valores_concatenados = "\n".join(str(valor) for valor in valores)
+
+                item = QTableWidgetItem(valores_concatenados)
                 self.tabla.setItem(conteoFilas, i + 1, item)
+
+                # Calcular la altura necesaria en función de la cantidad de elementos en la lista
+                altura = len(valores) * self.tabla.rowHeight(conteoFilas)
+                maxAltura = max(maxAltura, altura)
+
+            self.tabla.setRowHeight(conteoFilas, maxAltura)
 
             conteoFilas += 1
 
     def accion_itemClic(self, itemclic):
 
-        elementoSelecciondo = itemclic.text()
+        elementoSelecciondo = itemclic.tableWidget().item(itemclic.row(), 0).text()
         self.ventanaProductos = Ventana_Productos(self, self.dProveedores, elementoSelecciondo)
         self.ventanaProductos.show()
-
-    def accion_BotonAdd(self):
-
-        for nProveedor, productosProveedor in self.dProveedores.items():
-
-            if productosProveedor:
-
-                nuevodato = "mega 3l"
-                productosProveedor.remove(nuevodato)
-                self.dProveedores[nProveedor] = productosProveedor
-
 
 
 
@@ -251,7 +275,15 @@ class Ventana_Proveedores(QMainWindow):
 
         if opcion.text() == "Añadir proveedor":
 
-            adicionar_proveedor.VentanaAdicionar(self)
+            ultimaFila = self.tabla.rowCount()
+
+            self.tabla.insertRow(ultimaFila)
+
+            self.tabla.setItem(ultimaFila, 0, QTableWidgetItem(''))
+            self.tabla.setItem(ultimaFila, 1, QTableWidgetItem(''))
+            self.tabla.setItem(ultimaFila, 2, QTableWidgetItem(''))
+            self.tabla.setItem(ultimaFila, 3, QTableWidgetItem(''))
+            self.tabla.setItem(ultimaFila, 4, QTableWidgetItem(''))
 
         if opcion.text() == "Eliminar proveedor":
 
@@ -266,7 +298,7 @@ class Ventana_Proveedores(QMainWindow):
             mensajeConfirmacion = QMessageBox.question(self, 'Confirmación', '¿Está seguro/a de eliminar este proveedor?',
                                                        QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.No)
 
-            if mensajeConfirmacion == QMessageBox.StandardButton.Yes:
+            if mensajeConfirmacion == QMessageBox.StandardButton.Ok:
 
                 if (
                         self.tabla.item(filaActual, 0).text() != '' and
@@ -275,50 +307,20 @@ class Ventana_Proveedores(QMainWindow):
                         self.tabla.item(filaActual, 3).text() != '' and
                         self.tabla.item(filaActual, 4).text() != ''
                 ):
-                    self.file = open('BaseDeDatos/proveedores.txt', 'rb')
 
-                    proveedores = []
-
-                    while self.file:
-                        linea = self.file.readline().decode('UTF-8')
-
-                        # obtenemos del string una lista con 11 datos separados por ;
-                        lista = linea.split(";")
-                        # se para si ya no hay mas registros en el archivo
-                        if linea == '':
-                            break
-
-                        # creamos un objeto tipo cliente llamado u
-                        objetoProveedores = Proveedores(
-                            lista[0],
-                            lista[1],
-                            lista[2],
-                            lista[3],
-                            lista[4],
-                        )
-
-                        # METEMOS EL OBJETO EN LA LISTA DE USUARIOS
-                        proveedores.append(objetoProveedores)
-
-                    # cerramos el archivo
-                    self.file.close()
-
-                    for p in proveedores:
+                    for p in self.proveedores:
                         if (
-                                objetoProveedores.nombreProveedor == self.tabla.item(filaActual, 1).text()
+                                p.nombreProveedor == self.tabla.item(filaActual, 0).text()
                         ):
-                            proveedores.remove(objetoProveedores)
+                            self.proveedores.remove(p)
 
                             break
 
                     self.file = open('BaseDeDatos/proveedores.txt', 'wb')
 
-                    for p in proveedores:
-                        self.file.write(bytes(objetoProveedores.nombreProveedor + ";"
-                                              + objetoProveedores.nombreProducto + ";"
-                                              + objetoProveedores.cantidadComprada + ";"
-                                              + objetoProveedores.valor + ";"
-                                              + objetoProveedores.cantidadAlmacen, encoding='UTF-8'))
+                    for p in self.proveedores:
+                        self.file.write(bytes(p.nombreProveedor + ";\n"
+                                              , encoding='UTF-8'))
                     self.file.close()
 
                     self.tabla.removeRow(filaActual)
@@ -327,22 +329,102 @@ class Ventana_Proveedores(QMainWindow):
                         self,
                         'Confirmation',
                         'El registro ha sido eliminado exitosamente.',
-                        QMessageBox.StandardButton.Yes
+                        QMessageBox.StandardButton.Ok
                     )
+                else:
 
                     self.tabla.removeRow(filaActual)
 
+
+
         if opcion.text() == "Modificar proveedor":
 
-            ultimaFila = self.tabla.rowCount()
+            filaActual = self.tabla.currentRow()
 
-            self.tabla.insertRow(ultimaFila)
+            if filaActual < 0:
+                return QMessageBox.warning(self, 'Advertencia', 'Para editar, debe seleccionar un registro')
 
-            self.tabla.setItem(ultimaFila, 0, QTableWidgetItem(''))
-            self.tabla.setItem(ultimaFila, 1, QTableWidgetItem(''))
-            self.tabla.setItem(ultimaFila, 2, QTableWidgetItem(''))
-            self.tabla.setItem(ultimaFila, 3, QTableWidgetItem(''))
-            self.tabla.setItem(ultimaFila, 4, QTableWidgetItem(''))
+            boton = QMessageBox.question(
+                self,
+                'Confirmación',
+                '¿Está seguro de que quiere editar este registro?',
+                QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.No
+            )
+            if boton == QMessageBox.StandardButton.Ok:
+                nombreProveedorActualizado = self.tabla.item(filaActual, 0).text()
+
+                with open('BaseDeDatos/proveedores.txt', 'r', encoding='UTF-8') as archivo:
+                    lineas = archivo.readlines()
+
+                with open('BaseDeDatos/proveedores.txt', 'w', encoding='UTF-8') as archivo:
+                    for i, linea in enumerate(lineas):
+                        if i == filaActual:
+                            archivo.write(nombreProveedorActualizado + ";\n")
+                        else:
+                            archivo.write(linea)
+
+                QMessageBox.question(
+                    self,
+                    'Confirmación',
+                    'Los datos del registro se han editado exitosamente.',
+                    QMessageBox.StandardButton.Ok
+                )
+
+    def accion_botonAdd(self):
+
+        filaActual = self.tabla.currentRow()
+
+        if filaActual < 0:
+            return QMessageBox.warning(self, 'Advertencia', 'Para ingresar, debe seleccionar un registro')
+
+        boton = QMessageBox.question(
+            self,
+            'Confirmación',
+            '¿Está seguro de que quiere ingresar este nuevo registro?',
+            QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.No
+        )
+
+        datosVacios = True
+
+        if boton == QMessageBox.StandardButton.Ok:
+            if (
+                    self.tabla.item(filaActual, 0).text() != ''
+            ):
+                datosVacios = False
+
+                existeRegistro = False
+
+                existeProveedor = False
+
+                for p in self.proveedores:
+                    if (
+                            p.nombreProveedor == self.tabla.item(filaActual, 0).text()
+
+                    ):
+                        existeProveedor = True
+
+                        return QMessageBox.warning(self, 'Advertencia', 'Registro duplicado, no se puede registrar')
+
+                        break
+
+                    if not existeProveedor:
+
+                        self.file = open('BaseDeDatos/proveedores.txt', 'ab')
+
+                        self.file.write(bytes(self.tabla.item(filaActual, 0).text() + ";""\n"
+                                              , encoding='UTF-8'))
+                        self.file.seek(0, 2)
+                        self.file.close()
+
+                    return QMessageBox.question(
+                        self,
+                        'Confirmación',
+                        'Los datos del registro se han ingresado exitosamente.',
+                        QMessageBox.StandardButton.Ok
+                    )
+
+            if datosVacios:
+                return QMessageBox.warning(self, 'Advertencia', 'Debe ingresar todos los datos en el registro')
 
     def accion_botonVolver(self):
 
@@ -351,8 +433,9 @@ class Ventana_Proveedores(QMainWindow):
 
     def accion_botonVerProductos(self):
 
+        item=None
         self.hide()
-        self.ventanaProductos = Ventana_Productos(self, self.dProveedores)
+        self.ventanaProductos = Ventana_Productos(self, self.dProveedores, item)
         self.ventanaProductos.show()
 
 
