@@ -6,6 +6,8 @@ from PyQt5.QtWidgets import QMainWindow, QPushButton, QApplication, QVBoxLayout,
     QDesktopWidget
 from PyQt5 import QtGui, QtCore, QtWidgets
 
+from ventana_busquedas import Ventana_Busquedas
+from ventana_estadisticas import Ventana_Estadisticas
 from ventana_proveedores import Ventana_Proveedores
 
 
@@ -59,12 +61,24 @@ class Ventana_Principal(QMainWindow):
 
         self.botonEstadisticas = QPushButton("Estadísticas")
         self.botonEstadisticas.clicked.connect(self.accion_botonEstadisticas)
+        self.botonEstadisticas.setStyleSheet(
+            "background-color: #4DA4FF; color: #000000; margin-bottom: 10px; border:solid; border-width:1px; border-color: FF0000;")
+        self.botonEstadisticas.setFont(QFont("Comic Sans MS", 15))
+        self.botonEstadisticas.setFixedWidth(250)
 
         self.botonBuscar = QPushButton("Búsquedas")
         self.botonBuscar.clicked.connect(self.accion_botonBuscar)
+        self.botonBuscar.setStyleSheet(
+            "background-color: #4DA4FF; color: #000000; margin-bottom: 10px; border:solid; border-width:1px; border-color: FF0000;")
+        self.botonBuscar.setFont(QFont("Comic Sans MS", 15))
+        self.botonBuscar.setFixedWidth(250)
 
         self.botonVolver = QPushButton("Volver al inicio")
         self.botonVolver.clicked.connect(self.accion_botonVolver)
+        self.botonVolver.setStyleSheet(
+            "background-color: #FF0000; color: #000000; margin-bottom: 10px; border:solid; border-width:1px; border-color: FF0000;")
+        self.botonVolver.setFont(QFont("Comic Sans MS", 13))
+        self.botonVolver.setFixedWidth(150)
 
         self.grid.addWidget(self.letrero1, 0, 0, QtCore.Qt.AlignCenter | QtCore.Qt.AlignTop)
         self.grid.addWidget(self.botonProveedores, 1, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignCenter)
@@ -81,10 +95,16 @@ class Ventana_Principal(QMainWindow):
         self.proveedores.show()
 
     def accion_botonEstadisticas(self):
-        print("2")
+
+        self.hide()
+        self.estadisticas = Ventana_Estadisticas(self)
+        self.estadisticas.show()
 
     def accion_botonBuscar(self):
-        print("3")
+
+        self.hide()
+        self.busquedas = Ventana_Busquedas(self)
+        self.busquedas.show()
 
     def accion_botonVolver(self):
         self.hide()

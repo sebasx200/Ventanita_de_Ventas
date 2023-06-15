@@ -65,6 +65,10 @@ class Ventana_Productos(QMainWindow):
 
         self.barradeProductos.actionTriggered[QAction].connect(self.accion_barradeProductos)
 
+        if not self.datosProveedor:
+
+            self.barradeProductos.hide()
+
         self.file = open('BaseDeDatos/productos.txt', 'rb')
 
         self.productos = []
@@ -97,11 +101,23 @@ class Ventana_Productos(QMainWindow):
         self.grid = QtWidgets.QGridLayout()
 
         self.letrero1 = QLabel()
+        if self.datosProveedor:
 
-        self.letrero1.setText("Productos registrados " + str(self.elementoSeleccionado))
+            self.letrero1.setText("Productos registrados " + str(self.elementoSeleccionado))
+
+        else:
+            self.letrero1.setText("Productos registrados")
+
         self.letrero1.setFont(QFont("Arial", 15))
         self.letrero1.setStyleSheet("color: #000000; margin-bottom: 15px")
 
+        self.botonAdd = QPushButton("Aceptar")
+        self.botonAdd.setStyleSheet("background-color : #FFFFFF;"
+                                    "color : #000000;"
+                                    "padding: 10 px;"
+                                    )
+        self.botonAdd.setFixedWidth(100)
+        self.botonAdd.clicked.connect(self.accion_botonAdd)
 
         self.botonVolver = QPushButton("Volver")
         self.botonVolver.clicked.connect(self.accion_botonVolver)
@@ -141,6 +157,7 @@ class Ventana_Productos(QMainWindow):
         self.grid.addWidget(self.letrero1, 1, 0, QtCore.Qt.AlignCenter | QtCore.Qt.AlignTop)
         self.grid.addWidget(self.scrollArea, 2, 0, QtCore.Qt.AlignCenter | QtCore.Qt.AlignBottom)
         self.grid.addWidget(self.botonVolver, 3, 0, QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom)
+        self.grid.addWidget(self.botonAdd, 4, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight)
 
 
         self.fondo.setLayout(self.grid)
@@ -148,20 +165,21 @@ class Ventana_Productos(QMainWindow):
         if self.datosProveedor==None:
             self.llenar_tablasSinItem()
             print(self.dProveedores)
-
-        self.llenar_tabla()
+        else:
+            self.llenar_tabla()
 
 
     def llenar_tabla(self):
 
 
         conteoFilas = self.tabla.rowCount()
+
         if self.datosProveedor:
 
             self.tabla.insertRow(conteoFilas)
 
             for column, dato in enumerate(self.datosProveedor):
-                item = QTableWidgetItem(str(dato))
+                item = QTableWidgetItem(", ".join(str(v) for v in dato))
                 self.tabla.setItem(conteoFilas, column, item)
 
     def llenar_tablasSinItem(self):
@@ -172,10 +190,13 @@ class Ventana_Productos(QMainWindow):
 
         datosDiccionario = self.dProveedores.values()
 
+
         for valores in datosDiccionario:
+
             self.tabla.insertRow(conteoFilas)
+
             for i, valor in enumerate(valores):
-                item = QTableWidgetItem(str(valor))
+                item = QTableWidgetItem(", ".join(str(v) for v in valor))
                 self.tabla.setItem(conteoFilas, i, item)
             conteoFilas += 1
 
@@ -186,8 +207,50 @@ class Ventana_Productos(QMainWindow):
 
         if opcion.text() == "Añadir producto":
 
-            pass
+            ultimaFila = self.tabla.rowCount()
 
+            self.tabla.insertRow(ultimaFila)
+
+            self.tabla.setItem(ultimaFila, 0, QTableWidgetItem(''))
+            self.tabla.setItem(ultimaFila, 1, QTableWidgetItem(''))
+            self.tabla.setItem(ultimaFila, 2, QTableWidgetItem(''))
+            self.tabla.setItem(ultimaFila, 3, QTableWidgetItem(''))
+
+    def accion_botonAdd(self):
+
+        filaActual = self.tabla.currentRow()
+
+        if filaActual < 0:
+            return QMessageBox.warning(self, 'Advertencia', 'Para ingresar, debe seleccionar un registro')
+
+
+        nombre_proveedor = self.elementoSeleccionado
+        nombre_producto = self.tabla.item(filaActual, 0).text()
+        cantidad_comprada = self.tabla.item(filaActual, 0).text()
+        valor = self.tabla.item(filaActual, 0).text()
+        cantidad_almacen = self.tabla.item(filaActual, 0).text()
+
+        # Verificar si la clave existe en el diccionario
+        if nombre_proveedor in self.dProveedores:
+            # La clave existe, agregar los datos del nuevo producto a la lista de valores
+            self.dProveedores[nombre_proveedor][0].append(nombre_producto)
+            self.dProveedores[nombre_proveedor][1].append(cantidad_comprada)
+            self.dProveedores[nombre_proveedor][2].append(valor)
+            self.dProveedores[nombre_proveedor][3].append(cantidad_almacen)
+            self.guardardiccionario(self.dProveedores, 'BaseDeDatos/diccionario.txt')
+        else:
+            # La clave no existe, mostrar un mensaje de error o realizar alguna acción de manejo de errores
+            print('La clave no existe en el diccionario')
+
+        # Verificar si el cambio se reflejó en el diccionario
+        print(self.dProveedores)
+
+    def guardardiccionario(self, diccionario, nombreArchivo):
+
+        with open(nombreArchivo, 'w') as archivo:
+            for clave, valor in diccionario.items():
+                linea = f"{clave}: {valor}\n"
+                archivo.write(linea)
     def accion_botonVolver(self):
 
         self.hide()
